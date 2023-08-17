@@ -1,0 +1,93 @@
+clear
+close all
+rng('default')
+colors = matlab_plot_colors;
+
+%% Define parameters
+mu_theta0 = [0; 0];
+sigma_theta0 = 10*eye(2);
+sigma_n = 1;              % Noise standard deviation
+N = 10;                     % Number of data points
+N1 = 5; 
+z_lim = [0 10];
+
+%% Create training data
+z_train = zeros(N,1);
+y_train = zeros(N,1);
+for i = 1:N
+    z_train(i) = z_lim(1) + rand*(z_lim(2)-z_lim(1));
+    y_train(i) = g(z_train(i)) + sigma_n*randn;
+end
+
+%% Learn model iteratively
+mu_theta_vec1 = [mu_theta0, zeros(2,N)];
+Sigma_theta_vec1 = cell(1,N+1);
+Sigma_theta_vec1{1} = sigma_theta0;
+mu_theta_vec2 = mu_theta_vec1;
+Sigma_theta_vec2 = Sigma_theta_vec1;
+for i = 1:N
+    Sigma_theta_vec1{i+1} = (Sigma_theta_vec1{i}^(-1) + 1/sigma_n^2 * phi1(z_train(i))*phi1(z_train(i))')^(-1);
+    mu_theta_vec1(:,i+1) = Sigma_theta_vec1{i+1}*(Sigma_theta_vec1{i}\mu_theta_vec1(:,i) + 1/sigma_n^2 * phi1(z_train(i)) * y_train(i));
+    Sigma_theta_vec2{i+1} = (Sigma_theta_vec2{i}^(-1) + 1/sigma_n^2 * phi2(z_train(i))*phi2(z_train(i))')^(-1);
+    mu_theta_vec2(:,i+1) = Sigma_theta_vec2{i+1}*(Sigma_theta_vec2{i}\mu_theta_vec2(:,i) + 1/sigma_n^2 * phi2(z_train(i)) * y_train(i));
+end
+
+% Compute function prediction
+z_plot = linspace(z_lim(1),z_lim(2),51);
+mu_pred1_N1 = (mu_theta_vec1(:,N1+1)' * phi1(z_plot))';
+mu_pred2_N1 = (mu_theta_vec2(:,N1+1)' * phi2(z_plot))';
+mu_pred1 = (mu_theta_vec1(:,end)' * phi1(z_plot))';
+mu_pred2 = (mu_theta_vec2(:,end)' * phi2(z_plot))';
+sd_pred1_N1 = zeros(N1,1);
+sd_pred2_N1 = zeros(N1,1);
+sd_pred1 = zeros(51,1);
+sd_pred2 = zeros(51,1);
+for i = 1:51
+    sd_pred1_N1(i) = sqrt(phi1(z_plot(i))' * Sigma_theta_vec1{N1+1} * phi1(z_plot(i)));
+    sd_pred2_N1(i) = sqrt(phi2(z_plot(i))' * Sigma_theta_vec2{N1+1} * phi2(z_plot(i)));
+    sd_pred1(i) = sqrt(phi1(z_plot(i))' * Sigma_theta_vec1{end} * phi1(z_plot(i)));
+    sd_pred2(i) = sqrt(phi2(z_plot(i))' * Sigma_theta_vec2{end} * phi2(z_plot(i)));
+end
+
+%% Plot 
+tiledlayout(2,2,'TileSpacing','compact')
+
+nexttile 
+hold on
+scatter(z_train(1:N1),y_train(1:N1),'r'); hold on   % Data
+plot(z_plot, g(z_plot),'--r')           % True function
+plot(z_plot, mu_pred1_N1,'b','LineWidth',1);     % Estimated function
+patch([z_plot';flipud(z_plot')],[mu_pred1_N1 - 2*sd_pred1_N1;flipud(mu_pred1_N1 + 2*sd_pred1_N1)],'k','FaceAlpha',0.1); % Prediction intervals
+
+nexttile 
+hold on
+scatter(z_train(1:N1),y_train(1:N1),'r'); hold on   % Data
+plot(z_plot, g(z_plot),'--r')           % True function
+plot(z_plot, mu_pred2_N1,'b','LineWidth',1);     % Estimated function
+patch([z_plot';flipud(z_plot')],[mu_pred2_N1 - 2*sd_pred2_N1;flipud(mu_pred2_N1 + 2*sd_pred2_N1)],'k','FaceAlpha',0.1); % Prediction intervals
+
+nexttile 
+hold on
+scatter(z_train,y_train,'r'); hold on   % Data
+plot(z_plot, g(z_plot),'--r')           % True function
+plot(z_plot, mu_pred1,'b','LineWidth',1);     % Estimated function
+patch([z_plot';flipud(z_plot')],[mu_pred1 - 2*sd_pred1;flipud(mu_pred1 + 2*sd_pred1)],'k','FaceAlpha',0.1); % Prediction intervals
+
+nexttile 
+hold on
+scatter(z_train,y_train,'r'); hold on   % Data
+plot(z_plot, g(z_plot),'--r')           % True function
+plot(z_plot, mu_pred2,'b','LineWidth',1);     % Estimated function
+patch([z_plot';flipud(z_plot')],[mu_pred2 - 2*sd_pred2;flipud(mu_pred2 + 2*sd_pred2)],'k','FaceAlpha',0.1); % Prediction intervals
+
+function res = phi1(z)
+    res = [z; sin(z)];
+end
+
+function res = phi2(z)
+    res = [z; z.*sin(z)];
+end
+
+function res = g(z)
+    res = z.*sin(z);
+end

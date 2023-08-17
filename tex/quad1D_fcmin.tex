@@ -1,0 +1,39 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\definecolor{mycolor1}{rgb}{0.00000,0.44700,0.74100}%
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=4.521in,
+height=3.566in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=60,
+xmax=200,
+xlabel style={font=\color{white!15!black}},
+xlabel={$N$},
+ymin=-5,
+ymax=45,
+ylabel style={font=\color{white!15!black}},
+ylabel={$f_{c,min}$},
+axis background/.style={fill=white}
+]
+\addplot [color=mycolor1, forget plot]
+ plot [error bars/.cd, y dir=both, y explicit, error bar style={line width=0.5pt}, error mark options={line width=0.5pt, mark size=6.0pt, rotate=90}]
+ table[row sep=crcr, y error plus index=2, y error minus index=3]{%
+60	19.4399002075195	21.9650564097879	21.9650564097879\\
+80	5.79104919433594	8.2860176002021	8.2860176002021\\
+100	3.92350158691406	7.37812300691609	7.37812300691609\\
+120	2.74206695556641	4.40975627031854	4.40975627031854\\
+140	2.58846740722656	3.29292438153925	3.29292438153925\\
+160	2.10265350341797	2.10770044465469	2.10770044465469\\
+180	1.82270050048828	0.853020356787818	0.853020356787818\\
+200	1.54312591552734	0.108299536134598	0.108299536134598\\
+};
+\end{axis}
+\end{tikzpicture}%

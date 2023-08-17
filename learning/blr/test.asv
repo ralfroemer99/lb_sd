@@ -1,0 +1,30 @@
+rng('default')
+
+%% Define parameters
+mu_theta0 = 0;
+sigma_theta0 = 1;
+sigma_n = 0.1;      % Noise variance
+N = 100;            % Number of data points
+x_lim = [-10, 10];
+theta = 3;          % True parameter value   
+
+%% Create training data
+x_train = zeros(N,1);
+y_train = zeros(N,1);
+for i = 1:100
+    x_train(i) = x_lim(1) + rand*(x_lim(2)-x_lim(1));
+    y_train(i) = theta*x_train(i) + sigma_n*randn;
+end
+% Plot data
+figure(1)
+scatter(x_train,y_train); hold on
+plot(x_lim, theta*x_lim)
+
+%% Learn model iteratively
+mu_theta_vec = [mu_theta0; zeros(N,1)];
+sigma_theta_vec = [sigma_theta0; zeros(N,1)];
+for i = 2:N+1
+    sigma_theta_vec(i+1) = sqrt(1/(1/sigma_theta_vec(i+1)^2 + x_trai))
+    mu_theta_vec(i) = 
+end
+
