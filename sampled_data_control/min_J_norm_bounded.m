@@ -76,10 +76,13 @@ parfor i = 1:tmp
     end
 end
 
-% Find best solution
-eta_min = min(eta_vec(eta_vec > 0));
-idx = find(eta_vec == eta_min);
-K = K_all(:,:,idx);
-
+% Check if the problem was feasible
+if all(eta_vec == 0)        % Infeasible: Return -1
+    eta_min = -1;
+    K = zeros(m,n);
+else                        % Feasible: Return optimal controller
+    eta_min = min(eta_vec(eta_vec > 0));
+    idx = find(eta_vec == eta_min);
+    K = K_all(:,:,idx);
 end
-
+end

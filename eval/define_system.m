@@ -12,7 +12,8 @@ switch system
         f = @quad2D_dynamics; params = quad2D_params;
         x_s = [1,0,0,0,0,0]; u_s = [0.981,0.981];
         sigma_n = [0.1,0.1,0.1,0.1,0.1,0.1];
-        N_vec = 100:50:500;       for_which_optimize = 1:19;
+        N_vec = 200:50:1000;       
+        for_which_optimize = 1:9;
         J1 = diag([100,1,100,1,100,1]); J2 = 0.01*eye(m);
 
         delta_x0 = [0.2,0,0.2,0,0,0;
