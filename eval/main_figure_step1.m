@@ -24,11 +24,12 @@ define_system
 fc_vec = 10:2:30;
 
 %% Train GP models
-n_trials = 5;
+n_trials = 1;
 
 %% Train models and compute minimum control frequency
 disp('Starting model learning')
 
+tic
 % Storage variables for the system matrices
 A_all = zeros(n,n,length(N_vec),n_trials);
 B_all = zeros(n,m,length(N_vec),n_trials);
@@ -85,6 +86,7 @@ for p = 1:n_trials
     end
 end
 
+toc 
 % Save data
 save(save_path + "A_all",'A_all');
 save(save_path + "B_all",'B_all');
