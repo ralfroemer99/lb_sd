@@ -1,5 +1,5 @@
-% Learn the nonlinear dynamics from measured data and design a sampled-data
-% controller for the linearized system. 
+% Learn the nonlinear dynamics from measured data and design an optimized
+% sampled-data controller for the linearized system.
 
 % addpath '/home/ralf/mosek/10.0/toolbox/r2017aom'          % Ubuntu
 % addpath 'C:\Program Files\Mosek\10.0\toolbox\r2017aom'    % Windows
@@ -9,22 +9,20 @@ clear
 rng('default')
 warning('off','all')
 
-% Where to save the data
-save_path = "./data/";
-
-% Whether to also compute optimized controllers
-optimize_K = 1;
+% Specify save path
+save_path = "./eval/data/sim_trajectories/";
 
 %% Specify system model and simulation
 % System model
 system = 'quad2D';
 define_system
 
-% Specify the factor between used sampling time and MSI
-xi = 1./[1, 1.25, 1.5, 2];
+% Specify the factors between the used sampling time and the maximum
+% sampling interval for which to compute controllers.
+xi = 1./[1, 1.25, 1.5, 2];    % 1.25
 
 %% Train GP models
-n_trials = 10;
+n_trials = 5;
 Ts_max_vec = zeros(length(N_vec),n_trials);
 
 %% Train models and compute minimum control frequency
@@ -35,11 +33,11 @@ A_all = zeros(n,n,length(N_vec),n_trials);
 B_all = zeros(n,m,length(N_vec),n_trials);
 Au_all = zeros(n,n,length(N_vec),n_trials);
 Bu_all = zeros(n,m,length(N_vec),n_trials);
-K_all = zeros(m,n,length(for_which_optimize),n_trials,length(xi));
+K_all = zeros(m,n,length(N_vec),n_trials,length(xi));
 
+% Compute the minimum control frequency.
 for p = 1:n_trials
-    disp(p)
-    % Create noise-free samples
+    % Create noise-free training samples
     switch system
         case 'quad1D'
             [z_obs,y_obs] = quad1D_samples(N_vec(end),params);
@@ -94,30 +92,42 @@ for p = 1:n_trials
         Ts_max_vec(j,p) = Ts_max;
 
         % Save control gain
-        if ismember(j,for_which_optimize)
-            K_all(:,:,j,p,1) = K;
-        end
+        K_all(:,:,j,p,1) = K;
     end
 end
 
-% Compute how often the optimization problem could be solved
-disp(Ts_max_vec);
+pause(1)
+disp('Starting controller optimization')
 
-% Plot minimum control frequency over N
-if length(N_vec) > 1
-    % Remove results where Ts_max = 0
-    fc_min_mean = zeros(1,length(N_vec));
-    fc_min_std = zeros(1,length(N_vec));
-    for k = 1:length(N_vec)
-        tmp = Ts_max_vec(k,:);
-        tmp = tmp(tmp >= 0.01);
-        fc_min_mean(k) = mean(1./tmp);
-        fc_min_std(k) = std(1./tmp);
-    end    
-    figure()
-    errorbar(N_vec,fc_min_mean,fc_min_std);
-    xlabel('$N$','Interpreter','latex');
-    ylabel('$f_{c,min}$','Interpreter','latex');
+%% Compute optimized controllers for different control frequencies
+for q = 2:length(xi)
+    fprintf("Optimizing controller for fc = %.2f * fc_min \n", 1/xi(q))
+    for j = 1:length(N_vec)        % Don't optimize for all N
+        for p = 1:n_trials
+            % Get system matrices and uncertainty
+            A = A_all(:,:,j,p);
+            B = B_all(:,:,j,p);
+            Au = Au_all(:,:,j,p);
+            Bu = Bu_all(:,:,j,p);
+
+            % Transform uncertainty representation
+            [H,E,F] = transform_uncertainty(Au,Bu);
+
+            % Set sampling time
+            Ts_max = Ts_max_vec(j,p);
+            if Ts_max == 0
+                continue
+            end
+            Ts = xi(q) * Ts_max;
+
+            % Maximize performance for a given sampling time
+            eps_vec = logspace(-2,2,10);
+            [eta, K, eta_vec] = min_J_norm_bounded(A,B,H,E,F,Ts,J1,J2,eps_vec);
+
+            % Save control gain
+            K_all(:,:,j,p,q) = K;
+        end
+    end
 end
 
 % Save data
@@ -127,45 +137,5 @@ save(save_path + "Au_all",'Au_all');
 save(save_path + "Bu_all",'Bu_all');
 save(save_path + "N_vec",'N_vec');
 save(save_path + "Ts_max_vec",'Ts_max_vec');
-
-pause(1)
-
-if optimize_K
-    disp('Starting controller optimization')
-    %% Optimize Performance
-    
-    for q = 2:length(xi)
-        disp(xi(q))
-        for j = 1:length(for_which_optimize)        % Don't optimize for all N
-            for p = 1:n_trials
-                % Get system matrices and uncertainty
-                A = A_all(:,:,for_which_optimize(j),p);
-                B = B_all(:,:,for_which_optimize(j),p);
-                Au = Au_all(:,:,for_which_optimize(j),p);
-                Bu = Bu_all(:,:,for_which_optimize(j),p);
-    
-                % Transform uncertainty representation
-                [H,E,F] = transform_uncertainty(Au,Bu);
-    
-                % Set sampling time
-                Ts_max = Ts_max_vec(for_which_optimize(j),p);
-                if Ts_max == 0
-                    continue
-                end
-                Ts = xi(q) * Ts_max;
-    
-                % Maximize performance for a given sampling time
-                eps_vec = logspace(-2,2,10);
-                [eta, K, eta_vec] = min_J_norm_bounded(A,B,H,E,F,Ts,J1,J2,eps_vec);
-    
-                % Save control gain
-                K_all(:,:,j,p,q) = K;
-            end
-        end
-    end
-    
-    %% Save everything
-    save(save_path + "K_all",'K_all');
-    save(save_path + "xi",'xi');
-    save(save_path + "for_which_optimize",'for_which_optimize');
-end
+save(save_path + "K_all",'K_all');
+save(save_path + "xi",'xi');

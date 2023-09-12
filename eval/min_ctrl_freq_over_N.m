@@ -15,7 +15,9 @@ system = 'quad2D';
 define_system
 
 %% Train GP models
+% Specify the number of random datasets to draw and average over.
 n_trials = 4;
+
 Ts_max_vec = zeros(length(N_vec),n_trials);
 
 %% Train models and compute minimum control frequency
@@ -62,10 +64,6 @@ for p = 1:n_trials
         [A,B] = dmu2AB(dmu,n);
         [Au,Bu] = dSigma2AB(dSigma,n);
 
-        % Save system matrices
-        A_all(:,:,j,p) = A;         B_all(:,:,j,p) = B;
-        Au_all(:,:,j,p) = Au;       Bu_all(:,:,j,p) = Bu;
-
         % Transform the matrix-valued uncertainty
         [H,E,F] = transform_uncertainty(Au,Bu);
 
@@ -79,18 +77,34 @@ for p = 1:n_trials
 end
 
 % Plot minimum control frequency over the number of datapoints N
+success_rate = zeros(1,length(N_vec));
 if length(N_vec) > 1
     % Remove results where Ts_max = 0
     fc_min_mean = zeros(1,length(N_vec));
     fc_min_std = zeros(1,length(N_vec));
     for k = 1:length(N_vec)
-        tmp = Ts_max_vec(k,:);
-        tmp = tmp(tmp >= 0.01);
-        fc_min_mean(k) = mean(1./tmp);
-        fc_min_std(k) = std(1./tmp);
+        tmp1 = Ts_max_vec(k,:);
+        tmp2 = tmp1(tmp1 >= 0.001);
+        fc_min_mean(k) = mean(1./tmp2);
+        fc_min_std(k) = std(1./tmp2);
+        success_rate(k) = length(tmp2) / length(tmp1);
     end    
+  
+    % Plot minimum control frequency
     figure()
     errorbar(N_vec,fc_min_mean,fc_min_std);
-    xlabel('$N$','Interpreter','latex');
-    ylabel('$f_{c,min}$','Interpreter','latex');
+    xlabel('Number of data points $N$','Interpreter','latex');
+    ylabel('Minimum control frequency $f_{c,min}$','Interpreter','latex');
+    title('Minimum control frequency')
+    xlim([N_vec(1) - 25, N_vec(end) + 25])
+
+    % Plot success rate, i.e., how many times a stabilizing controller 
+    % could be found
+    figure()
+    scatter(N_vec, success_rate,'r','Marker','o');
+    xlabel('Number of data points $N$','Interpreter','latex');
+    ylabel('Success rate','Interpreter','latex');
+    title('Success rate in computing a robustly stabilizing controller')
+    xlim([N_vec(1) - 25, N_vec(end) + 25])
+    ylim([-0.05 1.05])
 end
