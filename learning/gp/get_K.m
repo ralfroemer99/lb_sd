@@ -1,5 +1,8 @@
 function K = get_K(Z,sigma_f,L_inv,sigma_n)
-    [N,~] = size(Z);
+% Compute the kernel gram matrix for the inputs in Z and the 
+% squared-exponential kernel.
+
+[N,~] = size(Z);
     K = zeros(N);
     for i = 1:N
         z_i = Z(i,:);
@@ -10,4 +13,3 @@ function K = get_K(Z,sigma_f,L_inv,sigma_n)
     end
     K = K + sigma_n^2 * eye(N);
 end
-

@@ -12,9 +12,6 @@ warning('off','all')
 % Where to save the data
 save_path = "./eval/data/main_figure/";
 
-% Whether to also compute optimized controllers
-optimize_K = 1;
-
 %% Specify system model and simulation
 % System model
 system = 'quad2D';

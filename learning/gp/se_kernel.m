@@ -1,4 +1,8 @@
 function val = se_kernel(z1,z2,sigma_f,L_inv)
+% Evaluate the squared-exponential (SE) kernel for two input vectors z1 and
+% z2 with the output variance sigma_f and the length scales specified by
+% L_inv.
+
 % Ensure that z1 and z2 are column vectors
 if length(z1) ~= 1
     if size(z1,1) == 1

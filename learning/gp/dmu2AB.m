@@ -1,4 +1,7 @@
 function [A,B] = dmu2AB(dmu,n)
+% Transform the GP mean derivative into the system matrices of the nominal
+% linearized system.
+
 if size(dmu,2) ~= n
     dmu = dmu';
 end

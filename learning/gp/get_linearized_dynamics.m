@@ -1,4 +1,10 @@
 function [A,B,Au,Bu] = get_linearized_dynamics(gpr,sigma_n,y_obs,x_s,u_s)
+% Compute the uncertain linearization of a learned GP dynamics model at the
+% state-input pair (x_s,u_s). The linearization has the form
+% dx = (A + Au o Omega) * x + (B + Bu o Psi) * u
+% where Omega (Psi) is an n x n (n x m) matrix with unknown elements in 
+% [-1,1] and o denotes the element-wise product.
+
 % Get dimensions
 n = length(x_s);
 m = length(u_s);
