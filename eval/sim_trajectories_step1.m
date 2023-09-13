@@ -22,7 +22,7 @@ define_system
 xi = 1./[1, 1.25, 1.5, 2];    % 1.25
 
 %% Train GP models
-n_trials = 5;
+n_trials = 10;
 Ts_max_vec = zeros(length(N_vec),n_trials);
 
 %% Train models and compute minimum control frequency

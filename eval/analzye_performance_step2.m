@@ -6,12 +6,11 @@
 
 close all
 clear
-rng('default')
 warning('off','all')
 colors = matlab_plot_colors;
 
 % Where to load the data from
-load_path = "./eval/data/main_figure/";
+load_path = "./eval/data/analyze_performance/main_figure_v1/";
 
 %% Specify system simulation
 % System model

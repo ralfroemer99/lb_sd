@@ -6,11 +6,12 @@
 
 close all
 clear
-rng('default')
+% rng('default')
+rng(2,'twister')
 warning('off','all')
 
 % Where to save the data
-save_path = "./eval/data/main_figure/";
+save_path = "./eval/data/analyze_performance/main_fig_low_res_seed2/";
 
 %% Specify system model and simulation
 % System model
@@ -21,7 +22,7 @@ define_system
 fc_vec = 10:2:30;
 
 %% Train GP models
-n_trials = 1;
+n_trials = 4;
 
 %% Train models and compute minimum control frequency
 disp('Starting model learning')

@@ -11,7 +11,7 @@ warning('off','all')
 colors = matlab_plot_colors;
 
 % Where to load the data from
-load_path = "./eval/data/sim_trajectories/gam4p5/";
+load_path = "./eval/data/sim_trajectories/";
 
 %% Specify system simulation
 % System model
