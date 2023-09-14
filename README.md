@@ -21,7 +21,7 @@ The first script creates datasets with different amounts of randomly drawn sampl
 The resulting plot corresponds to Fig. 3 of the paper.
 
 # Analyze the tradeoff between data and control frequency in terms of performance
-- (Optional:) Run eval/sim_trajectories_step1.m
-- Run eval/sim_trajectories_step2.m
+- (Optional:) Run eval/analyze_performance_step1.m
+- Run eval/analyze_performance_step2.m
 The first script creates datasets with different amounts of randomly drawn samples similar to eval/min_fc_over_N.m. For each dataset, the dynamics are learned using GP regression and linearized. Optimized controllers operating at fixed frequencies between 10 and 30 Hz are computed by solving a semidefinite program. The quadrotor system is simulated with the different controllers and control frequencies for different initial conditions, and the average cost is computed.
 The resulting plot corresponds to Fig. 4 of the paper.
