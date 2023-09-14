@@ -11,7 +11,7 @@ rng(2,'twister')
 warning('off','all')
 
 % Where to save the data
-save_path = "./eval/data/analyze_performance/main_fig_low_res_seed2/";
+save_path = "./eval/data/analyze_performance/main_fig_v1/";
 
 %% Specify system model and simulation
 % System model

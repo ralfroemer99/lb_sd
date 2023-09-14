@@ -16,7 +16,7 @@ define_system
 
 %% Train GP models
 % Specify the number of random datasets to draw and average over.
-n_trials = 4;
+n_trials = 10;
 
 Ts_max_vec = zeros(length(N_vec),n_trials);
 

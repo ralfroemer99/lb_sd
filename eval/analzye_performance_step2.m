@@ -10,7 +10,7 @@ warning('off','all')
 colors = matlab_plot_colors;
 
 % Where to load the data from
-load_path = "./eval/data/analyze_performance/main_figure_v1/";
+load_path = "./eval/data/analyze_performance/main_fig_low_res/all/";
 
 %% Specify system simulation
 % System model
@@ -135,9 +135,9 @@ colorbar
 
 % Draw contour lines
 [N_plot,fc_plot] = meshgrid(N_vec,fc_vec);
-contour(N_plot,fc_plot,J_mean_mat',[5:10]);
+% contour(N_plot,fc_plot,J_mean_mat',[5:10]);
 % contour(N_plot,fc_plot,J_mean_mat',[5.5, 7, 8.5, 10]);
-% contour(N_plot,fc_plot,J_mean_mat',[5.5, 7.5, 9.5]);
+contour(N_plot,fc_plot,J_mean_mat',[5.5, 7.5, 9.5]);
 
 xlim([150 1050]);
 ylim([9 31]);
