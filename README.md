@@ -1,11 +1,11 @@
 # lb_sd
-This repository provides the code for the results reported in the paper "Is Data All That Matters? The Role of Control Frequency for the Stability and Closed-Loop Performance of Uncertain Systems", available HERE.
+This repository provides the code to reproduce the results in the paper "Is Data All That Matters? The Role of Control Frequency for the Stability and Closed-Loop Performance of Uncertain Systems", available HERE.
 
 ## Installation
-- Install MATLAB with the Statistics and Machine Learning Toolbox
-- Clone the repository
-- Install the MOSEK Optimization suite (available at https://docs.mosek.com/latest/install/installation.html)
-- Download YALMIP (available at https://yalmip.github.io/download/) 
+- Install MATLAB with the Statistics and Machine Learning Toolbox.
+- Clone the repository.
+- Install the MOSEK Optimization suite (available at https://docs.mosek.com/latest/install/installation.html).
+- Download YALMIP (available at https://yalmip.github.io/download/).
 
 ## Run the Code
 # Compute the minimum control frequency (MCF)
