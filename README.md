@@ -11,6 +11,7 @@ This repository provides the code to reproduce the results in the paper "Is Data
 # Compute the minimum control frequency (MCF)
 - Run eval/min_fc_over_N.m
 The script creates datasets with different amounts of randomly drawn samples. For each dataset, the dynamics are learned using GP regression and linearized. For each linearized system, the MCF is computed by solving a semidefinite program.
+
 The resulting plot corresponds to Fig. 2 of the paper.
 
 
@@ -20,6 +21,7 @@ The resulting plot corresponds to Fig. 2 of the paper.
 
 
 The first script creates datasets with different amounts of randomly drawn samples and learns and linearizes the dynamics similar to eval/min_fc_over_N.m. For each linearized system, the MCF is computed by solving a semidefinite program. Then, optimized controllers operating at {1.25,1.5,2}*MCF are computed by solving another semidefinite program. The second script simulates the 2D quadrotor with each controller and the corresponding control frequency for different amounts of training data.
+
 The resulting plot corresponds to Fig. 3 of the paper.
 
 # Analyze the tradeoff between data and control frequency in terms of performance
@@ -28,4 +30,5 @@ The resulting plot corresponds to Fig. 3 of the paper.
 
 
 The first script creates datasets with different amounts of randomly drawn samples and learns and linearizes the dynamics similar to eval/min_fc_over_N.m. Optimized controllers operating at fixed frequencies between 10 and 30 Hz are computed by solving a semidefinite program. The second script simulates the 2D quadrotor system with each controller and control frequency for different initial conditions and computes the average cost.
+
 The resulting plot corresponds to Fig. 4 of the paper.
