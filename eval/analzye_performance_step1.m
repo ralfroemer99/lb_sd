@@ -6,12 +6,12 @@
 
 close all
 clear
-% rng('default')
-rng(2,'twister')
+rng('default')
+% rng(2,'twister')
 warning('off','all')
 
 % Where to save the data
-save_path = "./eval/data/analyze_performance/main_fig_v1/";
+save_path = "./eval/data/analyze_performance/main_fig_medium_res/1to2_seed0/";
 
 %% Specify system model and simulation
 % System model
@@ -19,10 +19,10 @@ system = 'quad2D';
 define_system
 
 % Specify the factor between used sampling time and MSI
-fc_vec = 10:2:30;
+fc_vec = 10:1.5:30;
 
 %% Train GP models
-n_trials = 4;
+n_trials = 2;
 
 %% Train models and compute minimum control frequency
 disp('Starting model learning')

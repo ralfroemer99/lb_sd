@@ -7,7 +7,7 @@ save_path = "./eval/data/analyze_performance/main_fig_low_res/all/";
 
 % Provide list of subpaths
 % paths = {'1to5_seed0','6_seed1','7to8_seed2','9_seed3'};
-paths = {"1to5_seed0","1to5_seed0","1to5_seed0"};
+paths = {"1to5_seed0","7to8_seed2"};
 
 % Initialize variables
 load(load_path_base + paths{1} + "/" + "A_all",'A_all');

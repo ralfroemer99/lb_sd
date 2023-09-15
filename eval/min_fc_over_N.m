@@ -21,9 +21,8 @@ n_trials = 10;
 Ts_max_vec = zeros(length(N_vec),n_trials);
 
 %% Train models and compute minimum control frequency
-disp('Starting model learning')
-
 for p = 1:n_trials
+    fprintf("Trial number %.f \n", p);
     % Create noise-free training samples
     switch system
         case 'quad1D'

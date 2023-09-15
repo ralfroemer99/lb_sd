@@ -110,8 +110,8 @@ for j=1:length(N_vec)
         % Check if more than 50% of the trials were infeasible
         tmp1 = J_vec(:,j,q);
         tmp2 = tmp1(tmp1 ~= -1);
-        % if length(tmp2) < 0.5 * length(tmp1)
-        if length(tmp2) <= 2
+        if length(tmp2) < 0.5 * length(tmp1)
+        % if length(tmp2) <= 2
             J_mean_mat(j,q) = -1;
             N_plot_infeasible = [N_plot_infeasible; N_vec(j)];
             fc_plot_infeasible = [fc_plot_infeasible; fc_vec(q)];
