@@ -8,6 +8,7 @@ save_path = "./eval/data/analyze_performance/main_fig_low_res/all/";
 % Provide list of subpaths
 % paths = {'1to5_seed0','6_seed1','7to8_seed2','9_seed3'};
 paths = {"1to5_seed0","7to8_seed2"};
+dim = 5;
 
 % Initialize variables
 load(load_path_base + paths{1} + "/" + "A_all",'A_all');
@@ -25,17 +26,24 @@ for i = 2:length(paths)
     Au_all_tmp = load(load_path_base + paths{i} + "/" + "Au_all",'Au_all').Au_all;
     Bu_all_tmp = load(load_path_base + paths{i} + "/" + "Bu_all",'Bu_all').Bu_all;
     K_all_tmp = load(load_path_base + paths{i} + "/" + "K_all",'K_all').K_all;
+    fc_vec_tmp = load(load_path_base + paths{i} + "/" + "fc_vec",'fc_vec').fc_vec;
     
-    % Concatenate
-    A_all = cat(4,A_all,A_all_tmp);
-    B_all = cat(4,B_all,B_all_tmp);
-    Au_all = cat(4,Au_all,Au_all_tmp);
-    Bu_all = cat(4,Bu_all,Bu_all_tmp);
-    K_all = cat(4,K_all,K_all_tmp);
+    if dim == 4
+        % Concatenate
+        A_all = cat(dim,A_all,A_all_tmp);
+        B_all = cat(dim,B_all,B_all_tmp);
+        Au_all = cat(dim,Au_all,Au_all_tmp);
+        Bu_all = cat(dim,Bu_all,Bu_all_tmp);
+        K_all = cat(dim,K_all,K_all_tmp);
+    elseif dim == 5
+        K_all = cat(dim,K_all,K_all_tmp);
+        % Frequencies
+        fc_vec = [fc_vec, fc_vec_tmp];
+    end
 end
 
 % Save variables
-save(save_path + "A_all",'A_all');
+save(save_path + "A_all",'A_all');  
 save(save_path + "B_all",'B_all');
 save(save_path + "Au_all",'Au_all');
 save(save_path + "Bu_all",'Bu_all');
