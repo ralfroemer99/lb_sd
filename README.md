@@ -5,10 +5,10 @@ In this paper, we combine Gaussian process (GP) model learning with sampled-data
 ![alt text](https://github.com/ralfroemer99/lb_sd/blob/main/framework_structure.jpg?raw=true)
 
 ## Installation
-- Install MATLAB with the Statistics and Machine Learning Toolbox.
+- Install MATLAB with the Statistics and Machine Learning Toolbox (https://matlab.mathworks.com/).
 - Clone the repository.
-- Install the MOSEK Optimization suite (available at https://docs.mosek.com/latest/install/installation.html).
-- Download YALMIP (available at https://yalmip.github.io/download/).
+- Install the MOSEK Optimization suite (https://docs.mosek.com/latest/install/installation.html).
+- Download YALMIP (https://yalmip.github.io/download/).
 
 ## Run the Code
 ### Compute the Minimum Control Frequency (MCF)
