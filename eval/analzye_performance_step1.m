@@ -11,7 +11,7 @@ rng(4,'twister')
 warning('off','all')
 
 % Where to save the data
-save_path = "./eval/data/analyze_performance/main_fig_medium_res/7_seed4/";
+save_path = "./eval/data/analyze_performance/main_fig_medium_res/7_seed4/fc_28_to_31/";
 
 %% Specify system model and simulation
 % System model
@@ -19,7 +19,7 @@ system = 'quad2D';
 define_system
 
 % Specify the factor between used sampling time and MSI
-fc_vec = 10:1.5:30;
+fc_vec = 28:1.5:31;
 
 %% Train GP models
 n_trials = 1;
