@@ -22,7 +22,7 @@ The resulting plot corresponds to Figure 2 of the paper.
 
 
 ### Simulate the System at Different Control Frequencies
-- Step 1 (optional): Run eval/sim_trajectories_step1.m
+- Step 1: Run eval/sim_trajectories_step1.m
 - Step 2: Run eval/sim_trajectories_step2.m
 
 
@@ -32,7 +32,7 @@ The resulting plot corresponds to Figure 3 of the paper.
 ![alt text](https://github.com/ralfroemer99/lb_sd/blob/main/fig_3.jpg?raw=true)
 
 ### Analyze the Tradeoff between Data and Control Frequency
-- Step 1 (optional): Run eval/analyze_performance_step1.m
+- Step 1: Run eval/analyze_performance_step1.m
 - Step 2: Run eval/analyze_performance_step2.m
 
 
