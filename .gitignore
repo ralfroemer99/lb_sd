@@ -1,5 +1,6 @@
 # Folders to ignore
 yalmip/
+tex/
 
 # Windows default autosave extension
 *.asv
