@@ -1,0 +1,8 @@
+Crazyflie setup:
+In the cfclient, set the last two digits of the address to 06 if the crazyflie has number 6.
+Test the propellers via Console.
+
+In the crayflies.yaml file, set the channel to the number seen in "radio" in the cfclient.
+
+In one terminal, run: roslaunch crazyswarm hover_swarm.launch
+In another terminal, run: python3 figure8_csv.py or any other Script in scripts.

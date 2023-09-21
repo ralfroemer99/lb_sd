@@ -29,13 +29,13 @@ lmi2 = ...
     [2*Q1-R, zeros(n), Y'*B';
      zeros(n), Z1, Z2;
      B*Y, Z2, Z3] >= 0;
-const = [Ts_inv >= 1, Q1 >= small_scalar*eye(n), R >= small_scalar*eye(n), lmi1,lmi2, 1000 >= Ts_inv >= 1];
+const = [100 >= Ts_inv >= 0.1, Q1 >= small_scalar*eye(n), R >= small_scalar*eye(n), lmi1,lmi2];
 
 % Objective
 obj = Ts_inv;
 
 % Solve using the bisection method
-diagnostics = bisection(const, obj, sdpsettings('solver','mosek','verbose',0));
+diagnostics = bisection(const, obj, sdpsettings('solver','mosek','verbose',2));
 
 % Get sampling time and control gain
 Ts_max = 1/value(Ts_inv);
