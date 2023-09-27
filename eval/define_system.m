@@ -30,9 +30,11 @@ switch system
 
         % Observation noise standard deviation
         sigma_n = [0.1,0.1,0.1,0.1,0.1,0.1];
+        % sigma_n = [0.2,0.2,0.2,0.2,0.2,0.2];
 
         % Number of datapoints to train from
-        N_vec = 200:50:1000;       
+        N_vec = 100:50:1000;  
+        % N_vec = 200:200:800;
         
         % Cost weight matrices
         J1 = diag([100,1,100,1,100,1]); J2 = 0.01*eye(m);

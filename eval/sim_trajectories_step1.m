@@ -10,7 +10,7 @@ rng('default')
 warning('off','all')
 
 % Specify save path
-save_path = "./eval/data/sim_trajectories/";
+save_path = "./eval/data/sim_trajectories/sigma_0p1_1to20_seed0/";
 
 %% Specify system model and simulation
 % System model
@@ -22,7 +22,7 @@ define_system
 xi = 1./[1, 1.25, 1.5, 2];    % 1.25
 
 %% Train GP models
-n_trials = 10;
+n_trials = 20;
 Ts_max_vec = zeros(length(N_vec),n_trials);
 
 %% Train models and compute minimum control frequency

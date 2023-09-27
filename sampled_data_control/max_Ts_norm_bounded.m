@@ -10,8 +10,8 @@ K_all = zeros(m,n,length(eps_vec));
 
 % Stability LMIs --> Solve in parallel for different choices of eps
 parfor i=1:length(eps_vec)
-    eps4 = eps_vec(i);
-    eps3 = 1/eps4;
+    eps2 = eps_vec(i);
+    eps1 = 1/eps2;
 
     % Define optimization variables
     Ts_inv = sdpvar;
@@ -32,19 +32,19 @@ parfor i=1:length(eps_vec)
          zeros(p,n), zeros(p,n), zeros(p,n), zeros(p), zeros(p)];
     
     lmi1_rhs = -Ts_inv * ...
-        [Q2+Q2', Q3-Q2'+Q1*A'+Y'*B', zeros(n,n), zeros(n,p), eps3*(Q1*E'+Y'*E_u');
+        [Q2+Q2', Q3-Q2'+Q1*A'+Y'*B', zeros(n,n), zeros(n,p), eps1*(Q1*E'+Y'*E_u');
          Q3'-Q2+A*Q1'+B*Y, -Q3-Q3', zeros(n,n), H, zeros(n,p);
          zeros(n), zeros(n), zeros(n), zeros(n,p), zeros(n,p);
-         zeros(p,n), H', zeros(p,n), -eps3*eye(p), zeros(p);
-         eps3*(E*Q1'+E_u*Y), zeros(p,n), zeros(p,n), zeros(p), -eps3*eye(p)];
+         zeros(p,n), H', zeros(p,n), -eps1*eye(p), zeros(p);
+         eps1*(E*Q1'+E_u*Y), zeros(p,n), zeros(p,n), zeros(p), -eps1*eye(p)];
     lmi1 = lmi1_lhs <= lmi1_rhs - small_scalar*eye(3*n + 2*p);  % Always infeasible
     
     lmi2 = ...
-        [2*Q1-R, zeros(n), Y'*B', zeros(n,p), eps4*Y'*E_u';
+        [2*Q1-R, zeros(n), Y'*B', zeros(n,p), eps2*Y'*E_u';
          zeros(n), Z1, Z2, zeros(n,p), zeros(n,p);
          B*Y, Z2, Z3, H, zeros(n,p);
-         zeros(p,n), zeros(p,n), H', eps4*eye(p), zeros(p);
-         eps4*E_u*Y, zeros(p,n), zeros(p,n), zeros(p), eps4*eye(p)] >= 0;
+         zeros(p,n), zeros(p,n), H', eps2*eye(p), zeros(p);
+         eps2*E_u*Y, zeros(p,n), zeros(p,n), zeros(p), eps2*eye(p)] >= 0;
     const = [100 >= Ts_inv >= 0.1, Q1 >= small_scalar*eye(n), R >= small_scalar*eye(n), lmi1, lmi2];
 
     % Objective

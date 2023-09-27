@@ -6,8 +6,11 @@
 
 close all
 clear
-rng('default')
+% rng('default')
+rng(1,'twister')
 warning('off','all')
+
+save_path = "./eval/data/min_fc_over_N/";
 
 %% Specify system model and simulation
 % System model
@@ -16,7 +19,7 @@ define_system
 
 %% Train GP models
 % Specify the number of random datasets to draw and average over.
-n_trials = 10;
+n_trials = 20;
 
 Ts_max_vec = zeros(length(N_vec),n_trials);
 

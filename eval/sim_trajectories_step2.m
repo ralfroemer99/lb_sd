@@ -11,7 +11,7 @@ warning('off','all')
 colors = matlab_plot_colors;
 
 % Where to load the data from
-load_path = "./eval/data/sim_trajectories/";
+load_path = "./eval/data/sim_trajectories/sigma_0p1_1to20_seed0/";
 
 %% Specify system simulation
 % System model
