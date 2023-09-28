@@ -12,24 +12,18 @@ opts = delimitedTextImportOptions("NumVariables", 14);
 opts.DataLines = [1, Inf];
 opts.Delimiter = "\t";
 
-% Specify column names and types
-if ~catch_data
-    opts.VariableNames = ["VarName1", "Var2", "Var3", "VarName4", "Var5", "Var6", "Var7", "Var8", "Var9", "VarName10", "VarName11", "VarName12", "VarName13", "VarName14"];
-    opts.SelectedVariableNames = ["VarName1", "VarName4", "VarName10", "VarName11", "VarName12", "VarName13", "VarName14"];
-    opts.VariableTypes = ["double", "string", "string", "double", "string", "string", "string", "string", "string", "double", "double", "double", "double", "double"];
-else
-    opts.VariableNames = ["VarName1", "Var2", "Var3", "VarName4", "Var5", "Var6", "Var7", "Var8", "Var9", "VarName10", "VarName11", "VarName12", "VarName13"];
-    opts.SelectedVariableNames = ["VarName1", "VarName4", "VarName10", "VarName11", "VarName12", "VarName13"];
-    opts.VariableTypes = ["double", "string", "string", "double", "string", "string", "string", "string", "string", "double", "double", "double", "double"];
-end
+% Specify column names and types: time, x, y, z, roll, pitch, yaw, dx, dy, dz, thrust, delta_thrust
+opts.VariableNames = ["time", "x", "y", "z", "roll", "pitch", "yaw", "dx", "dy", "dz", "ddz", "thrust", "delta_thrust_vert", "delta_thrust_hor"];
+opts.SelectedVariableNames = ["time", "z", "dz", "ddz", "thrust", "delta_thrust_vert"];
+opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
 
 % Specify file level properties
 opts.ExtraColumnsRule = "ignore";
 opts.EmptyLineRule = "read";
 
 % Specify variable properties
-opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var6", "Var7", "Var8", "Var9"], "WhitespaceRule", "preserve");
-opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var6", "Var7", "Var8", "Var9"], "EmptyFieldRule", "auto");
+% opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var6", "Var7", "Var8", "Var9"], "WhitespaceRule", "preserve");
+% opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var6", "Var7", "Var8", "Var9"], "EmptyFieldRule", "auto");
 
 % Import the data
 dronedata = readtable(file, opts);

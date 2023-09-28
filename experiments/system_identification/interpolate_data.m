@@ -1,17 +1,20 @@
 function [data] = interpolate_data(data, dt)
     timestamps = data.iddata.timestamps;
-    states = data.iddata.states;
-    inputs = data.iddata.inputs;
+    X = data.iddata.X;
+    U = data.iddata.U;
+    Xd = data.iddata.Xd;
 
-    state_dim = size(states, 1);
-    input_dim = size(inputs, 1);
+    state_dim = size(X, 1);
+    input_dim = size(U, 1);
     
     timestamps_interp = min(timestamps): dt: max(timestamps);
-    states_interp = interp1(timestamps, states', timestamps_interp)';
-    inputs_interp = interp1(timestamps, inputs', timestamps_interp)';
+    X_interp = interp1(timestamps, X', timestamps_interp)';
+    U_interp = interp1(timestamps, U', timestamps_interp)';
+    Xd_interp = interp1(timestamps, Xd', timestamps_interp)';
     
-    states_interp = reshape(states_interp, state_dim, []);
-    inputs_interp = reshape(inputs_interp, input_dim, []);
+    X_interp = reshape(X_interp, state_dim, []);
+    U_interp = reshape(U_interp, input_dim, []);
+    Xd_interp = reshape(Xd_interp, input_dim, []);
     
     % figure(1);
     % for i = 1:1:state_dim
@@ -41,8 +44,9 @@ function [data] = interpolate_data(data, dt)
     % end
     
 	data.iddata_interp.timestamps = timestamps_interp;
-    data.iddata_interp.inputs = inputs_interp;
-    data.iddata_interp.states = states_interp;
+    data.iddata_interp.U = U_interp;
+    data.iddata_interp.X = X_interp;
+    data.iddata_interp.Xd = Xd_interp;
     data.iddata_interp.dt = dt;
     
     close all;
