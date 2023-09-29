@@ -2,6 +2,8 @@
 clear
 close all
 clc
+colors = matlab_plot_colors;
+rng('default')
 
 %% Set Parameters
 use_acc = true;
@@ -9,26 +11,38 @@ smooth_inputs = false;
 control_freq = 30;    % Control frequency for interpolation
 delta_t = 1 / control_freq;
 
+% Specify sampled-data controller to compute
 compute_Ts_max = true;
+optimize_controller = true;
+fc_des = 10; 
+Q = eye(2);     R = 100;
 
-file_ids = 4;   % 3
+N_how_many = [300];    % Set to [] to use all available data points
+
+% Training data:
+% file_ids = [3, 4, 5];   % 3
+file_ids = [5];
+file_path = "./experiments/data/training/track_sine_fc30trial";
+% start_idx = [290 + 1, 290 + 1, 290 + 1];
+% end_idx = [590 + 1, 1040 + 1, 1190 + 1]; 
+% start_idx = [290 + 1];
+% end_idx = [1190 + 1];  
+
+% Trajectories:
 % file_path = "./experiments/data/trajectories/setpoint_tracking_data_fc30";
-file_path = "./experiments/data/training/track_sine_fc30trial4";
-start_idx = 290 + 1;    % 290 + 1
-end_idx = 890 + 1;     % 590 + 1
 
 X = [];
 Y = [];
 
 % selected_id = 2;
-for selected_id = 1:length(file_ids)
+for k = 1:length(file_ids)
     %% Load data
-    % file = file_path + int2str(file_ids(selected_id));
-    file = file_path;
+    file = file_path + int2str(file_ids(k));
+    % file = file_path;
     dronetrainingdata = load_drone_data(file, 1);
 
     % Extract relevant part of the trajectory
-    dronetrainingdata = dronetrainingdata(start_idx:end_idx, :);
+    dronetrainingdata = dronetrainingdata(start_idx(k):end_idx(k), :);
     
     %% Get data in the correct format
     time_id = 1;
@@ -80,7 +94,7 @@ for selected_id = 1:length(file_ids)
     diff_vel = diff(data.X(2, :)) / delta_t;
     
     % Position
-    subplot(3, 1, 1)
+    subplot(4, 1, 1)
     hold on
     plot(data.timestamps, data.X(1, :), "Color", "r", "DisplayName", "Meas. $z$")
     plot(data.timestamps(1:end), integrate_vel, "Color", "b", "DisplayName", "Meas. $\dot{z}$ integrated")
@@ -90,7 +104,7 @@ for selected_id = 1:length(file_ids)
     title("Position")
     
     % Velocity
-    subplot(3, 1, 2)
+    subplot(4, 1, 2)
     hold on
     plot(data.timestamps, data.X(2, :), "Color", "r", "DisplayName", "Meas. $\dot{z}$")
     plot(data.timestamps(1:end), integrate_acc, "Color", "b", "DisplayName", "Meas. $\ddot{z}$ integrated")
@@ -101,7 +115,7 @@ for selected_id = 1:length(file_ids)
     title("Velocity")
     
     % Measured Acceleration vs. Differentiated Position
-    subplot(3, 1, 3)
+    subplot(4, 1, 3)
     hold on
     plot(data.timestamps, data.Xd, "Color", "r", "DisplayName", "Meas. $\ddot{z}$")
     plot(data.timestamps(2:end), diff_vel, "Color", "g", "DisplayName", "Meas. $\dot{z}$ differentiated")
@@ -109,6 +123,16 @@ for selected_id = 1:length(file_ids)
     xlabel("$t$ in s", 'Interpreter','latex')
     ylabel("$\ddot{z}$ in $\frac{\mathrm{m}}{\mathrm{s}^2}$", 'Interpreter','latex')
     title("Acceleration")
+    hold off
+
+    % Thrust
+    subplot(4, 1, 4)
+    hold on
+    plot(data.timestamps, data.Xd, "Color", "r", "DisplayName", "Meas. $\ddot{z}$")
+    legend('Interpreter','latex')
+    xlabel("$t$ in s", 'Interpreter','latex')
+    ylabel("$T(t)$ in $\mathrm{N}$", 'Interpreter','latex')
+    title("Thrust")
     hold off
     
     Y = [Y; 
@@ -118,19 +142,28 @@ for selected_id = 1:length(file_ids)
 end
 
 %% Identify model iteratively using BLR
-N = size(X,1);
+if isempty(N_how_many)
+    N = size(X,1);
+else
+    N = N_how_many;
+end
 % sigma_n = [1,1,0.1];
 % Calculate meaningful noise variance: From std(Y' - data.inputs / 0.033)
 sigma_n = std(Y' - data.U / 0.033)^2;
+% sigma_n = 1;
 mu_theta_vec = [0; 0; 1/0.033];
 Sigma_theta_cell = cell(1,N+1);
 Sigma_theta_cell{1}= eye(3);
 Sigma_theta_vec = zeros(3,N+1);
 Sigma_theta_vec(:,1) = [1; 1; 10];
+
+reshuffled_indices = randperm(N,N);
 for i = 1:N
+    % Extract a random datapoint
+    j = reshuffled_indices(i);
     % Update mean vector and covariance matrix
-    Sigma_theta_cell{i+1} = (Sigma_theta_cell{i}^(-1) + diag(sigma_n.^(-2)) * X(i,:)'*X(i,:))^(-1);
-    mu_theta_vec(:,i+1) = Sigma_theta_cell{i+1}*(Sigma_theta_cell{i}\mu_theta_vec(:,i) + diag(sigma_n.^(-2)) * X(i,:)' * Y(i));
+    Sigma_theta_cell{i+1} = (Sigma_theta_cell{i}^(-1) + diag(sigma_n.^(-2)) * X(j,:)'*X(j,:))^(-1);
+    mu_theta_vec(:,i+1) = Sigma_theta_cell{i+1}*(Sigma_theta_cell{i}\mu_theta_vec(:,i) + diag(sigma_n.^(-2)) * X(j,:)' * Y(j));
     Sigma_theta_vec(:,i+1) = diag(Sigma_theta_cell{i+1});
 end
 
@@ -150,8 +183,16 @@ B_hat = C_hat(:,3)
 % Compute maximum sampling time
 if compute_Ts_max
     eps_vec = logspace(-3,3,20);
-    [Ts_max, K, Ts_vec] = max_Ts_norm_bounded(A,B,H,E,F,eps_vec);
-    Ts_max
+    [Ts_max, K, ~] = max_Ts_norm_bounded(A,B,H,E,F,eps_vec)
+    if Ts_max ~= 0
+        fc_min = 1/Ts_max
+    end
+end
+
+% Optimize controller
+if optimize_controller
+    eps_vec = logspace(-3,3,20);
+    [~, K_opt, eta_vec] = min_J_norm_bounded(A,B,H,E,F,1/fc_des,Q,R,eps_vec)
 end
 
 % Plot parameter mean
@@ -168,6 +209,17 @@ for i = 1:3
     subplot(1,3,i)
     plot(0:N,Sigma_theta_vec(i,:)); hold on
     legend("$\Sigma_{" + i + i + "}$",'interpreter','latex')
+end
+
+% Plot parameter mean with \pm 2 std.
+figure
+for i = 1:3
+    subplot(3,1,i)
+    tmp_mean = mu_theta_vec(i,:);
+    tmp_std = sqrt(Sigma_theta_vec(i,:));
+    [tmp1, tmp2] = shaded_plot_mean_std(0:N, tmp_mean, tmp_std);
+    fill(tmp1, tmp2, colors(i,:),'EdgeColor',colors(i,:),'FaceAlpha',0.2,'EdgeAlpha',0.2,'HandleVisibility','off'); hold on
+    plot(0:N,tmp_mean, 'Color', colors(i,:), 'LineWidth', 1);
 end
 
 % Fit integrator model manually

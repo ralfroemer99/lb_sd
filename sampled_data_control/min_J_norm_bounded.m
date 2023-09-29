@@ -10,7 +10,7 @@ p = size(E,1);
 eps_mat = [tmp1(:) tmp2(:)];
 
 % Create variables to store eta and K
-eta_vec = zeros(1,length(eps_vec)^2);
+eta_vec = -ones(1,length(eps_vec)^2);
 K_all = zeros(m,n,length(eps_vec)^2);
 
 % Stability LMIs
@@ -77,7 +77,7 @@ parfor i = 1:tmp
 end
 
 % Check if the problem was feasible
-if all(eta_vec == 0)        % Infeasible: Return -1
+if all(eta_vec == -1)        % Infeasible: Return -1
     eta_min = -1;
     K = zeros(m,n);
 else                        % Feasible: Return optimal controller
