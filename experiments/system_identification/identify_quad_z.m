@@ -1,5 +1,7 @@
 function [X,Y,zdd] = identify_quad_z(file_path,file_ids,start_idx,end_idx,delta_t,use_filtered)
 
+window_size = 5;
+
 X = [];
 Y = [];
 
@@ -55,7 +57,6 @@ for k = 1:length(file_ids)
     zdd = [zdd, zdd(end)];
 
     % Mean filter acceleration and thrust
-    window_size = 5;
     zdd_filtered = medfilt1(zdd,window_size);
     zdd_filtered = [zdd_filtered(2), zdd_filtered(2:end-1), zdd_filtered(end-1)];
     data.U_filtered = medfilt1(data.U,window_size);

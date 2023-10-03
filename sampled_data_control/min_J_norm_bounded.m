@@ -83,6 +83,6 @@ if all(eta_vec == -1)        % Infeasible: Return -1
 else                        % Feasible: Return optimal controller
     eta_min = min(eta_vec(eta_vec > 0));
     idx = find(eta_vec == eta_min);
-    K = K_all(:,:,idx);
+    K = K_all(:,:,idx(1));
 end
 end

@@ -3,35 +3,23 @@ clear
 close all
 clc
 colors = matlab_plot_colors;
-% rng('default')
-rng(1,'twister')
+rng('default')
+% rng(1,'twister')
 
 %% Set Parameters
-use_acc = true;
-smooth_inputs = false;
 control_freq = 30;    % Control frequency for interpolation
 delta_t = 1 / control_freq;
 
-% Specify sampled-data controller to compute
-compute_Ts_max = false;
-optimize_controller = false;
-fc_des = 10; 
-Q = eye(2);     R = 100;
-
-N_how_many = 901;    % Set to [] to use all available data points
 use_filtered_zdd_thrust = 1;
 
 % Training data:
 % file_ids = [3, 4, 5];   % 3
-file_ids = [5];
-file_path = "./experiments/data/training/track_sine_fc30trial";
+file_ids = [3];
+file_path = "./experiments/data/training/track_sine_fc30_different_amp_trial";
 % start_idx = [290 + 1, 290 + 1, 290 + 1];
 % end_idx = [590 + 1, 1040 + 1, 1190 + 1]; 
 start_idx = [290 + 1];
 end_idx = [1190 + 1];  
-
-% Trajectories:
-% file_path = "./experiments/data/trajectories/setpoint_tracking_data_fc30";
 
 X = [];
 Y = [];
@@ -106,6 +94,8 @@ for k = 1:length(file_ids)
     hold on
     plot(data.timestamps, data.X(1, :), "Color", colors(1,:), "DisplayName", "Meas. $z$")
     plot(data.timestamps(1:end), integrate_vel, "Color", colors(2,:), "DisplayName", "Meas. $\dot{z}$ integrated")
+    z_des = 1 + linspace(0.1,0.5,length(data.timestamps)).*sin(linspace(0,12*pi,length(data.timestamps)));
+    plot(data.timestamps, z_des, "Color", 'black', "DisplayName", "$z_\mathrm{des}$")
     legend('Interpreter','latex')
     xlabel("$t$ in s", 'Interpreter','latex')
     ylabel("$z$ in m", 'Interpreter','latex')
@@ -157,86 +147,3 @@ for k = 1:length(file_ids)
              data.X(1, :)', data.X(2, :)', data.U'];
     end
 end
-
-%% Identify model iteratively using BLR
-N = size(X,1);
-% sigma_n = [1,1,0.1];
-% Calculate meaningful noise variance: From std(Y' - data.inputs / 0.033)
-sigma_n = std(Y' - data.U / 0.033)^2;
-% sigma_n = 1;
-mu_theta_vec = [0; 0; 1/0.033];
-Sigma_theta_cell = cell(1,N+1);
-Sigma_theta_cell{1}= eye(3);
-Sigma_theta_vec = zeros(3,N+1);
-Sigma_theta_vec(:,1) = [1; 1; 100];
-
-reshuffled_indices = randperm(N,N);
-for i = 1:N
-    % Extract a random datapoint
-    j = reshuffled_indices(i);
-    % Update mean vector and covariance matrix
-    Sigma_theta_cell{i+1} = (Sigma_theta_cell{i}^(-1) + diag(sigma_n.^(-2)) * X(j,:)'*X(j,:))^(-1);
-    mu_theta_vec(:,i+1) = Sigma_theta_cell{i+1}*(Sigma_theta_cell{i}\mu_theta_vec(:,i) + diag(sigma_n.^(-2)) * X(j,:)' * Y(j));
-    Sigma_theta_vec(:,i+1) = diag(Sigma_theta_cell{i+1});
-end
-
-% Get parameter estimate
-C = [0 1 0; 0 0 0];
-C(2,:) = mu_theta_vec(:,N_how_many+1);
-A = C(:,1:2)       
-B = C(:,3)
-
-% Convert paramter distribution to confidence intervals and reparemeterize
-C_hat = zeros(2,3);
-C_hat(2,:) = sqrt(chi2inv(0.95,3)) * sqrt(diag(Sigma_theta_cell{N_how_many+1}))';
-A_hat = C_hat(:,1:2)   
-B_hat = C_hat(:,3)
-[H,E,F] = transform_uncertainty(A_hat,B_hat);
-
-% Compute maximum sampling time
-if compute_Ts_max
-    eps_vec = logspace(-3,3,20);
-    [Ts_max, K, ~] = max_Ts_norm_bounded(A,B,H,E,F,eps_vec)
-    if Ts_max ~= 0
-        fc_min = 1/Ts_max
-    end
-end
-
-% Optimize controller
-if optimize_controller
-    eps_vec = logspace(-3,3,20);
-    [~, K_opt, eta_vec] = min_J_norm_bounded(A,B,H,E,F,1/fc_des,Q,R,eps_vec);
-    K_opt
-end
-
-% Plot parameter mean
-figure
-for i = 1:3
-    subplot(1,3,i)
-    tmp = mu_theta_vec(i,:); plot(0:N,tmp(:)); hold on
-    legend("$\mu_" + i + "$",'interpreter','latex')
-end
-
-% Plot parameter covariances
-figure
-for i = 1:3
-    subplot(1,3,i)
-    plot(0:N,Sigma_theta_vec(i,:)); hold on
-    legend("$\Sigma_{" + i + i + "}$",'interpreter','latex')
-end
-
-% Plot parameter mean with \pm 2 std.
-figure
-for i = 1:3
-    subplot(3,1,i)
-    tmp_mean = mu_theta_vec(i,:);
-    tmp_std = sqrt(Sigma_theta_vec(i,:));
-    [tmp1, tmp2] = shaded_plot_mean_std(0:N, tmp_mean, tmp_std);
-    fill(tmp1, tmp2, colors(i,:),'EdgeColor',colors(i,:),'FaceAlpha',0.2,'EdgeAlpha',0.2,'HandleVisibility','off'); hold on
-    plot(0:N,tmp_mean, 'Color', colors(i,:), 'LineWidth', 1);
-end
-
-% Fit integrator model manually
-params = X \ Y;
-A = [0.0, 1; params(1), params(2)];
-B = [0.0; params(3)];
