@@ -3,45 +3,38 @@ clear
 close all
 clc
 colors = matlab_plot_colors;
-% rng('default')
-rng(1,'twister')
+rng('default')
+% rng(1,'twister')
 
 control_freq = 30;    % Control frequency for interpolation
 delta_t = 1 / control_freq;
 m = 0.035;
 
 % Specify sampled-data controller to compute
-N_vec = [100, 300, 500];
+N_vec = [250, 500, 750];
 % n_trials = 10;
 % N_vec = 900;
 n_trials = 1;
 
 use_filtered = 1;
 
-optimize_controller = 0;    
-Q = eye(2);     R = 1e3;
-% fc_des = [10, 15, 30];
-fc_des = [30, 15, 10];
+optimize_controller = 1;    
+Q = eye(2);     R = 1e2;
+fc_des = [60, 30, 15, 10];
 K_opt_vec = zeros(2,length(N_vec),length(fc_des),n_trials);
 
 % Training data:
-% file_ids = [3, 4, 5];   % 3
 file_ids = [3];
 file_path = "./experiments/data/training/track_sine_fc30_different_amp_trial";
-% start_idx = [290 + 1, 290 + 1, 290 + 1];
-% end_idx = [590 + 1, 1040 + 1, 1190 + 1];
 start_idx = [290 + 1];
 end_idx = [1190 + 1];
-
-% Trajectories:
-% file_path = "./experiments/data/trajectories/setpoint_tracking_data_fc30";
 
 [X,Y,zdd] = identify_quad_z(file_path,file_ids,start_idx,end_idx,delta_t,use_filtered);
 
 %% Identify model iteratively using BLR
 N = size(X,1);
 % Calculate meaningful noise variance: From std(Y' - data.inputs / m)
-sigma_n = (2 * std(Y - X(:,3) / m))^2;
+sigma_n = 2 * std(Y - X(:,3) / m);
 
 Ts_max_vec = zeros(n_trials,length(N_vec));
 
@@ -71,7 +64,7 @@ for j = 1:n_trials
 
         % Convert paramter distribution to confidence intervals and reparemeterize
         C_hat = zeros(2,3);
-        C_hat(2,:) = sqrt(chi2inv(0.95,3)) * sqrt(diag(Sigma_theta_cell{N_vec(k)+1}))';
+        C_hat(2,:) = sqrt(chi2inv(0.99,3)) * sqrt(diag(Sigma_theta_cell{N_vec(k)+1}))';
         A_hat = C_hat(:,1:2);
         B_hat = C_hat(:,3);
         [H,E,F] = transform_uncertainty(A_hat,B_hat);
@@ -139,6 +132,7 @@ if length(N_vec) > 1
     % Plot minimum control frequency
     figure()
     errorbar(N_vec,fc_min_mean,fc_min_std);
+    % plot(N_vec, fc_min_mean);
     xlabel('Number of data points $N$','Interpreter','latex');
     ylabel('Minimum control frequency $f_{c,min}$','Interpreter','latex');
     title('Minimum control frequency')
