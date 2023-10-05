@@ -19,8 +19,10 @@ n_trials = 1;
 use_filtered = 1;
 
 optimize_controller = 1;    
-Q = eye(2);     R = 1e2;
+% Q = eye(2);     R = 1;
+Q = diag([100, 1]);     R = 1;
 fc_des = [60, 30, 15, 10];
+% fc_des = [10];
 K_opt_vec = zeros(2,length(N_vec),length(fc_des),n_trials);
 
 % Training data:
