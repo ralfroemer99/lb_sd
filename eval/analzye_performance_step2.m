@@ -10,7 +10,7 @@ warning('off','all')
 colors = matlab_plot_colors;
 
 % Where to load the data from
-load_path = "./eval/data/analyze_performance/main_fig_medium_res/all/";
+load_path = "./eval/data/analyze_performance/main_fig_high_res/";
 
 %% Specify system simulation
 % System model

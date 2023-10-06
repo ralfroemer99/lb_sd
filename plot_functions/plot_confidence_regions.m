@@ -1,0 +1,39 @@
+close all
+clear
+
+% Define normal distribution
+mu = [2; 1];
+Sigma1 = diag([4 1]);
+Sigma2 = Sigma1 + [0 -1.5; -1.5 0];
+
+% Plot confidence regions
+p = 0.9;
+plot_ellipse(inv(chi2inv(p,2) * Sigma1),mu); hold on
+plot_ellipse(inv(chi2inv(p,2) * Sigma2),mu);
+
+tmp = chi2inv(p,2) * Sigma1;
+rectangle('Position',[mu(1) - sqrt(tmp(1,1)) ...
+    mu(2) - sqrt(tmp(2,2)) ...
+    2 * sqrt(tmp(1,1)) ...
+    2 * sqrt(tmp(2,2))])
+
+rectangle('Position',[mu(1) - sqrt(chi2inv(p,2) * Sigma2(1,1)) ...
+    mu(2) - sqrt(chi2inv(p,2) * Sigma2(2,2)) ...
+    2 * sqrt(chi2inv(p,2) * Sigma2(1,1)) ...
+    2 * sqrt(chi2inv(p,2) * Sigma2(2,2))])
+
+
+p = 0.99;
+plot_ellipse(inv(chi2inv(p,2) * Sigma1),mu); hold on
+rectangle('Position',[mu(1) - sqrt(chi2inv(p,2) * Sigma1(1,1)) ...
+    mu(2) - sqrt(chi2inv(p,2) * Sigma1(2,2)) ...
+    2 * sqrt(chi2inv(p,2) * Sigma1(1,1)) ...
+    2 * sqrt(chi2inv(p,2) * Sigma1(2,2))])
+
+plot_ellipse(inv(chi2inv(p,2) * Sigma2),mu); hold on
+rectangle('Position',[mu(1) - sqrt(chi2inv(p,2) * Sigma2(1,1)) ...
+    mu(2) - sqrt(chi2inv(p,2) * Sigma2(2,2)) ...
+    2 * sqrt(chi2inv(p,2) * Sigma2(1,1)) ...
+    2 * sqrt(chi2inv(p,2) * Sigma2(2,2))])
+
+
